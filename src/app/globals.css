@@ -6,14 +6,20 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: #141414;
   --color-foreground: var(--foreground);
   --font-sans: var(--font-bricolage), system-ui, sans-serif;
 }
 
+@media (prefers-color-scheme: light) {
+  @theme inline {
+    --color-background: #ffffff;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #000000;
+    --background: #141414;
     --foreground: #ffffff;
   }
 }

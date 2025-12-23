@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={bricolage.variable}>
-      <body className="antialiased">
+      <body className="antialiased bg-white dark:bg-neutral-900">
         {children}
       </body>
     </html>
