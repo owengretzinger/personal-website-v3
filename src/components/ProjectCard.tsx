@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { generateGradient } from "@/utils/colors";
 import { type Project } from "@/data/projects";
+import { YouTubeIcon } from "./icons";
 
 interface ProjectCardProps {
   project: Project;
@@ -61,6 +62,17 @@ export const ProjectCard = ({ project, colors = [], stars }: ProjectCardProps) =
               className="relative z-10 flex items-center gap-0.5 text-xs text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
             >
               <StarIcon /> {stars}
+            </a>
+          )}
+          {project.demo && (
+            <a
+              href={project.demo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative z-10 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+              title="Watch demo"
+            >
+              <YouTubeIcon className="w-3 h-3" />
             </a>
           )}
         </div>

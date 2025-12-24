@@ -1,0 +1,184 @@
+import sharp from "sharp";
+import * as fs from "fs";
+import * as path from "path";
+
+// Convert RGB to HSL
+const rgbToHsl = (r: number, g: number, b: number) => {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0,
+    s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        break;
+      case g:
+        h = ((b - r) / d + 2) / 6;
+        break;
+      case b:
+        h = ((r - g) / d + 4) / 6;
+        break;
+    }
+  }
+  return { h: h * 360, s, l };
+};
+
+// Convert HSL to RGB
+const hslToRgb = (h: number, s: number, l: number) => {
+  h /= 360;
+  const hue2rgb = (p: number, q: number, t: number) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+
+  let r, g, b;
+  if (s === 0) {
+    r = g = b = l;
+  } else {
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+  return {
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255),
+  };
+};
+
+// Adjust color for gradient
+const boostColor = (r: number, g: number, b: number) => {
+  const { h, s } = rgbToHsl(r, g, b);
+  const adjustedS = Math.min(0.5, s * 0.6);
+  const adjustedL = 0.55;
+  return hslToRgb(h, adjustedS, adjustedL);
+};
+
+async function extractColorsFromImage(imagePath: string): Promise<string[]> {
+  try {
+    const { data, info } = await sharp(imagePath)
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    const colorCandidates: Array<{
+      r: number;
+      g: number;
+      b: number;
+      h: number;
+      s: number;
+      l: number;
+    }> = [];
+
+    const channels = info.channels;
+    const step = 40 * channels;
+
+    for (let i = 0; i < data.length; i += step) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const { h, s, l } = rgbToHsl(r, g, b);
+
+      if (s > 0.25 && l > 0.15 && l < 0.85) {
+        colorCandidates.push({ r, g, b, h, s, l });
+      }
+    }
+
+    colorCandidates.sort((a, b) => b.s - a.s);
+
+    const selectedColors: Array<{ hex: string; h: number; s: number; l: number }> = [];
+    for (const candidate of colorCandidates) {
+      if (selectedColors.length >= 3) break;
+
+      const isDifferent =
+        selectedColors.length === 0 ||
+        selectedColors.every((existing) => {
+          const hueDiff = Math.min(
+            Math.abs(existing.h - candidate.h),
+            360 - Math.abs(existing.h - candidate.h)
+          );
+          const lightDiff = Math.abs(existing.l - candidate.l);
+          return hueDiff > 25 || lightDiff > 0.2;
+        });
+
+      if (isDifferent) {
+        const boosted = boostColor(candidate.r, candidate.g, candidate.b);
+        const hex = `#${boosted.r.toString(16).padStart(2, "0")}${boosted.g
+          .toString(16)
+          .padStart(2, "0")}${boosted.b.toString(16).padStart(2, "0")}`;
+        selectedColors.push({ hex, h: candidate.h, s: candidate.s, l: candidate.l });
+      }
+    }
+
+    if (selectedColors.length < 2) {
+      const fallbacks = ["#888888", "#666666"];
+      while (selectedColors.length < 2) {
+        selectedColors.push({ hex: fallbacks[selectedColors.length] || "#888888", h: 0, s: 0, l: 0.5 });
+      }
+    }
+
+    return selectedColors.slice(0, 3).map((c) => c.hex);
+  } catch (error) {
+    console.error(`Error processing ${imagePath}:`, error);
+    return ["#888888", "#666666"];
+  }
+}
+
+async function main() {
+  const publicDir = path.join(process.cwd(), "public");
+  const colors: Record<string, string[]> = {};
+
+  // Import projects and experience data
+  const { projects } = await import("../src/data/projects");
+  const { experience } = await import("../src/data/experience");
+
+  // Process project images
+  for (const project of projects) {
+    const imagePath = path.join(publicDir, project.image);
+    if (fs.existsSync(imagePath)) {
+      console.log(`Processing project: ${project.name}`);
+      colors[project.name] = await extractColorsFromImage(imagePath);
+    } else {
+      console.warn(`Image not found: ${imagePath}`);
+      colors[project.name] = ["#888888", "#666666"];
+    }
+  }
+
+  // Process work experience images
+  for (const exp of experience) {
+    const imagePath = path.join(publicDir, exp.image);
+    if (fs.existsSync(imagePath)) {
+      console.log(`Processing work: ${exp.company}`);
+      colors[exp.company] = await extractColorsFromImage(imagePath);
+    } else {
+      console.warn(`Image not found: ${imagePath}`);
+      colors[exp.company] = ["#888888", "#666666"];
+    }
+  }
+
+  // Generate TypeScript file
+  const output = `// Auto-generated by scripts/extract-colors.ts
+// Run: bun run extract-colors
+
+export const imageColors: Record<string, string[]> = ${JSON.stringify(colors, null, 2)};
+`;
+
+  const outputPath = path.join(process.cwd(), "src/data/colors.ts");
+  fs.writeFileSync(outputPath, output);
+  console.log(`\nColors extracted to ${outputPath}`);
+}
+
+main();
