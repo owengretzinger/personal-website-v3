@@ -211,7 +211,7 @@ export const TweetCard = ({ tweet }: TweetCardProps) => {
           {tweet.media.map(
             (m, i) =>
               m.url && (
-                <div key={i} className="relative">
+                <div key={i} className="relative min-w-0">
                   <Image
                     src={m.url}
                     alt={`Tweet media ${i + 1}`}
@@ -219,7 +219,7 @@ export const TweetCard = ({ tweet }: TweetCardProps) => {
                       m.aspectRatio ? Math.round(120 * m.aspectRatio) : 180
                     }
                     height={120}
-                    className="rounded-lg h-[120px] w-auto"
+                    className="rounded-lg h-auto max-h-[120px] w-full object-cover"
                   />
                   {/* Play icon for videos */}
                   {m.type === "video" && (
