@@ -50,7 +50,7 @@ export const projects: Project[] = [
   },
   {
     name: "symphony",
-    description: "multiplayer web app that transforms drawings into music",
+    description: "multiplayer web app where drawings turn into music",
     link: "https://github.com/owengretzinger/symphony",
     github: "https://github.com/owengretzinger/symphony",
     demo: "https://www.linkedin.com/feed/update/urn:li:ugcPost:7270103698960248832",
@@ -58,7 +58,7 @@ export const projects: Project[] = [
   },
   {
     name: "hackmate",
-    description: "hackathon project inspiration & documentation generator",
+    description: "project inspiration & documentation generator",
     link: "https://devpost.com/software/hackmate-3brfmx",
     github: "https://github.com/owengretzinger/hackmate",
     demo: "https://www.linkedin.com/feed/update/urn:li:ugcPost:7292087689204387840",
@@ -103,7 +103,7 @@ export const projects: Project[] = [
   },
   {
     name: "onus ai",
-    description: "ai accountability coach that calls you to keep you on track",
+    description: "ai accountability coach that calls you on the phone",
     link: "https://onusai.vercel.app/",
     demo: "https://x.com/owengretzinger/status/1903869076071465092",
     image: "/project-images/onus-ai.png",

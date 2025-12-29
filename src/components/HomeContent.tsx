@@ -43,7 +43,7 @@ export const HomeContent = ({
   } = useHomeHoverState(previousExperience.length, displayedProjects.length);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12 md:py-16">
+    <main className="mx-auto max-w-2xl px-4 md:px-6 py-12 md:py-16">
       {/* Header */}
       <header className="mb-10">
         <div className="flex items-center gap-3">
