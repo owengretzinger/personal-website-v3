@@ -6,9 +6,10 @@ interface CurrentExperienceCardProps {
   experience: Experience;
   colors?: string[];
   isActive?: boolean;
+  priority?: boolean;
 }
 
-export const CurrentExperienceCard = ({ experience, colors = [], isActive = false }: CurrentExperienceCardProps) => {
+export const CurrentExperienceCard = ({ experience, colors = [], isActive = false, priority = false }: CurrentExperienceCardProps) => {
   const gradient = colors.length > 0 ? generateGradient(colors) : undefined;
 
   return (
@@ -35,6 +36,7 @@ export const CurrentExperienceCard = ({ experience, colors = [], isActive = fals
         width={28}
         height={28}
         className="h-7 w-7 rounded object-cover flex-shrink-0"
+        priority={priority}
       />
       <div className="flex-1 min-w-0">
         <div className="mb-0.5 text-sm font-medium">{experience.title}</div>

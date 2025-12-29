@@ -44,6 +44,7 @@ export type Tweet = {
 
 interface TweetCardProps {
   tweet: Tweet;
+  priority?: boolean;
 }
 
 function formatRelativeTime(dateString: string): string {
@@ -167,7 +168,7 @@ function parseTweetText(text: string): React.ReactNode[] {
   return parts;
 }
 
-export const TweetCard = ({ tweet }: TweetCardProps) => {
+export const TweetCard = ({ tweet, priority = false }: TweetCardProps) => {
   const tweetUrl = `https://x.com/${tweet.author.screenName}/status/${tweet.id}`;
 
   return (
@@ -186,6 +187,7 @@ export const TweetCard = ({ tweet }: TweetCardProps) => {
             width={20}
             height={20}
             className="rounded-full"
+            priority={priority}
           />
           <span className="text-xs text-neutral-600 dark:text-neutral-400">
             @{tweet.author.screenName}
@@ -220,6 +222,7 @@ export const TweetCard = ({ tweet }: TweetCardProps) => {
                     }
                     height={120}
                     className="rounded-lg h-auto max-h-[120px] w-full object-cover"
+                    priority={priority}
                   />
                   {/* Play icon for videos */}
                   {m.type === "video" && (

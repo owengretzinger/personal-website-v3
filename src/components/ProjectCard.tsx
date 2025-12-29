@@ -8,6 +8,7 @@ interface ProjectCardProps {
   colors?: string[];
   stars?: number;
   isActive?: boolean; // For mobile center-hover effect
+  priority?: boolean;
 }
 
 const StarIcon = () => (
@@ -27,6 +28,7 @@ export const ProjectCard = ({
   colors = [],
   stars,
   isActive = false,
+  priority = false,
 }: ProjectCardProps) => {
   const mainLink = project.link || project.github;
   const gradient = colors.length > 0 ? generateGradient(colors) : undefined;
@@ -53,6 +55,7 @@ export const ProjectCard = ({
         width={28}
         height={28}
         className="h-7 w-7 rounded object-cover flex-shrink-0"
+        priority={priority}
       />
       <div className="flex-1 min-w-0">
         <div className="mb-0.5 flex items-center gap-2">

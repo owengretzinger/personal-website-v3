@@ -64,7 +64,7 @@ export const TweetCarousel = ({ tweets }: TweetCarouselProps) => {
         </div>
       )}
 
-      <TweetCard tweet={tweets[currentIndex]} />
+      <TweetCard tweet={tweets[currentIndex]} priority={currentIndex === 0} />
     </div>
   );
 };
