@@ -12,12 +12,18 @@ export const useHomeHoverState = (
   const projectRefs = useRef<(HTMLLIElement | null)[]>([]);
 
   const getItems = useCallback((): (HTMLElement | null)[] => {
+    // Ensure previousExpRefs has correct length even when collapsed
+    // This keeps index positions consistent with previousExpCount
+    const prevRefs: (HTMLLIElement | null)[] = [];
+    for (let i = 0; i < previousExpCount; i++) {
+      prevRefs.push(previousExpRefs.current[i] ?? null);
+    }
     return [
       currentExpRef.current,
-      ...previousExpRefs.current,
+      ...prevRefs,
       ...projectRefs.current,
     ];
-  }, []);
+  }, [previousExpCount]);
 
   const isWorkItem = useCallback((el: HTMLElement) => {
     if (el === currentExpRef.current) return true;
