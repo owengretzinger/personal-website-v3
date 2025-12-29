@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { useMobileCenterHover } from "@/hooks/useMobileCenterHover";
+import { useHomeHoverState } from "@/hooks/useHomeHoverState";
 import { ProjectCard } from "@/components/ProjectCard";
 import { TweetCarousel } from "@/components/TweetCarousel";
 import { CurrentExperienceCard } from "@/components/CurrentExperienceCard";
@@ -33,55 +33,14 @@ export const HomeContent = ({
   const currentExperience = experience[0];
   const previousExperience = experience.slice(1);
 
-  // Mobile center-hover: track all hoverable items
-  // Index layout: [currentExp, ...previousExp, ...projects]
-  const currentExpRef = useRef<HTMLDivElement | null>(null);
-  const previousExpRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const projectRefs = useRef<(HTMLLIElement | null)[]>([]);
-
-  // Callback to get all items - called by hook when needed
-  const getItems = useCallback((): (HTMLElement | null)[] => {
-    return [
-      currentExpRef.current,
-      ...previousExpRefs.current,
-      ...projectRefs.current,
-    ];
-  }, []);
-
-  // Check if element is a work item (current exp or previous exp)
-  const isWorkItem = useCallback((el: HTMLElement) => {
-    if (el === currentExpRef.current) return true;
-    if (previousExpRefs.current.includes(el as HTMLLIElement)) return true;
-    return false;
-  }, []);
-
-  const activeIndex = useMobileCenterHover(getItems, isWorkItem);
-
-  // Compute active states from index directly
-  // Index layout: [0: currentExp, 1..N: previousExp, N+1..: projects]
-  const { isCurrentExpActive, previousExpActiveIndex, projectActiveIndex } = useMemo(() => {
-    if (activeIndex === null) {
-      return { isCurrentExpActive: false, previousExpActiveIndex: null, projectActiveIndex: null };
-    }
-
-    // Index 0 is current experience
-    if (activeIndex === 0) {
-      return { isCurrentExpActive: true, previousExpActiveIndex: null, projectActiveIndex: null };
-    }
-
-    // Indices 1 to previousExperience.length are previous experiences
-    if (activeIndex <= previousExperience.length) {
-      return { isCurrentExpActive: false, previousExpActiveIndex: activeIndex - 1, projectActiveIndex: null };
-    }
-
-    // Rest are projects
-    const projIndex = activeIndex - 1 - previousExperience.length;
-    if (projIndex < displayedProjects.length) {
-      return { isCurrentExpActive: false, previousExpActiveIndex: null, projectActiveIndex: projIndex };
-    }
-
-    return { isCurrentExpActive: false, previousExpActiveIndex: null, projectActiveIndex: null };
-  }, [activeIndex, previousExperience.length, displayedProjects.length]);
+  const {
+    currentExpRef,
+    previousExpRefs,
+    projectRefs,
+    isCurrentExpActive,
+    previousExpActiveIndex,
+    projectActiveIndex,
+  } = useHomeHoverState(previousExperience.length, displayedProjects.length);
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12 md:py-16">
