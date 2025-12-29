@@ -116,6 +116,13 @@ export const projects: Project[] = [
     image: "/project-images/room-booking-system.webp",
   },
   {
+    name: "personal website v2",
+    description: "card-based portfolio with an easter egg",
+    link: "https://v2.owengretzinger.com",
+    github: "https://github.com/owengretzinger/personal-website-v2",
+    image: "/project-images/personal-website-v2.png",
+  },
+  {
     name: "personal website v1",
     description: "featuring cool animations",
     link: "https://v1.owengretzinger.com",

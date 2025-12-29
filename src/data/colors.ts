@@ -20,11 +20,6 @@ export const imageColors: Record<string, string[]> = {
     "#5382c6",
     "#c29357"
   ],
-  "onus ai": [
-    "#6753c6",
-    "#5778c2",
-    "#915ebb"
-  ],
   "(a)intern": [
     "#c66f53",
     "#bb5d6e",
@@ -63,10 +58,19 @@ export const imageColors: Record<string, string[]> = {
     "#888888",
     "#666666"
   ],
+  "onus ai": [
+    "#6753c6",
+    "#5778c2",
+    "#915ebb"
+  ],
   "room booking system": [
     "#c65358",
     "#bc5c5d",
     "#a77174"
+  ],
+  "personal website v2": [
+    "#888888",
+    "#666666"
   ],
   "personal website v1": [
     "#c66c53",
