@@ -43,8 +43,7 @@ export type Tweet = {
 };
 
 interface TweetCardProps {
-  tweet: Tweet | null;
-  loading?: boolean;
+  tweet: Tweet;
 }
 
 function formatRelativeTime(dateString: string): string {
@@ -168,35 +167,7 @@ function parseTweetText(text: string): React.ReactNode[] {
   return parts;
 }
 
-export const TweetCard = ({ tweet, loading }: TweetCardProps) => {
-  if (loading) {
-    return (
-      <div className="inline-block rounded-lg p-3 border border-neutral-200 dark:border-neutral-800">
-        <div className="animate-pulse">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700" />
-            <div className="h-3 w-24 bg-neutral-200 dark:bg-neutral-700 rounded" />
-            <div className="h-3 w-8 bg-neutral-200 dark:bg-neutral-700 rounded" />
-            <div className="w-3.5 h-3.5 bg-neutral-200 dark:bg-neutral-700 rounded ml-4" />
-          </div>
-          <div className="space-y-2 mb-3">
-            <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-64" />
-            <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-48" />
-          </div>
-          <div className="h-[120px] w-48 bg-neutral-200 dark:bg-neutral-700 rounded-lg mb-2" />
-          <div className="flex gap-4">
-            <div className="h-3 w-8 bg-neutral-200 dark:bg-neutral-700 rounded" />
-            <div className="h-3 w-8 bg-neutral-200 dark:bg-neutral-700 rounded" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!tweet) {
-    return null;
-  }
-
+export const TweetCard = ({ tweet }: TweetCardProps) => {
   const tweetUrl = `https://x.com/${tweet.author.screenName}/status/${tweet.id}`;
 
   return (

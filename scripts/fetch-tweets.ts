@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import * as fs from "fs";
+import * as path from "path";
 
 type TweetData = {
   id: string;
@@ -21,23 +22,13 @@ type TweetData = {
   }[];
 };
 
-type CacheEntry = {
-  data: TweetData[];
-  timestamp: number;
-};
-
-const cache: CacheEntry = {
-  data: [],
-  timestamp: 0,
-};
-
-const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours
 const TWITTER_USERNAME = "owengretzinger";
 const MIN_LIKES_THRESHOLD = 40;
 
 async function fetchTweets(): Promise<TweetData[]> {
   const bearerToken = process.env.TWITTER_API_BEARER_TOKEN;
   if (!bearerToken) {
+    console.error("TWITTER_API_BEARER_TOKEN not set");
     return [];
   }
 
@@ -164,29 +155,26 @@ async function fetchTweets(): Promise<TweetData[]> {
   }
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const count = Math.min(parseInt(searchParams.get("count") || "5", 10), 10);
-  const now = Date.now();
+async function main() {
+  console.log("Fetching tweets...");
 
-  // Return cached data if still valid
-  if (cache.data.length > 0 && now - cache.timestamp < CACHE_DURATION) {
-    return NextResponse.json(cache.data.slice(0, count));
-  }
+  const outputPath = path.join(process.cwd(), "src/data/tweets.json");
 
-  // Fetch fresh data
   const tweets = await fetchTweets();
 
   if (tweets.length > 0) {
-    cache.data = tweets;
-    cache.timestamp = now;
-    return NextResponse.json(tweets.slice(0, count));
+    fs.writeFileSync(outputPath, JSON.stringify(tweets, null, 2));
+    console.log(`Saved ${tweets.length} tweets to ${outputPath}`);
+  } else {
+    // Keep existing file if fetch failed
+    if (fs.existsSync(outputPath)) {
+      console.log("Fetch returned no tweets, keeping existing data");
+    } else {
+      // Create empty array if no existing file
+      fs.writeFileSync(outputPath, "[]");
+      console.log("No tweets fetched, created empty file");
+    }
   }
-
-  // Return stale cache if fetch failed
-  if (cache.data.length > 0) {
-    return NextResponse.json(cache.data.slice(0, count));
-  }
-
-  return NextResponse.json({ error: "Failed to fetch tweets" }, { status: 500 });
 }
+
+main();

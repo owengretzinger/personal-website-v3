@@ -1,0 +1,16 @@
+{"location":"route.ts:170","message":"GET handler entry","data":{"count":5},"timestamp":1767026528269,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:274","message":"After getCachedTweets","data":{"tweetsCount":15,"tweetsType":"object","isArray":true},"timestamp":1767026528270,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:176","message":"Before returning success","data":{"tweetsCount":15,"slicedCount":5,"serializedLength":3326},"timestamp":1767026528270,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:177","message":"Response created successfully","data":{},"timestamp":1767026528270,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:170","message":"GET handler entry","data":{"count":5},"timestamp":1767026528878,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:274","message":"After getCachedTweets","data":{"tweetsCount":15,"tweetsType":"object","isArray":true},"timestamp":1767026528879,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:176","message":"Before returning success","data":{"tweetsCount":15,"slicedCount":5,"serializedLength":3326},"timestamp":1767026528879,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:177","message":"Response created successfully","data":{},"timestamp":1767026528879,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:170","message":"GET handler entry","data":{"count":5},"timestamp":1767026529407,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:274","message":"After getCachedTweets","data":{"tweetsCount":15,"tweetsType":"object","isArray":true},"timestamp":1767026529407,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:176","message":"Before returning success","data":{"tweetsCount":15,"slicedCount":5,"serializedLength":3326},"timestamp":1767026529408,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:177","message":"Response created successfully","data":{},"timestamp":1767026529408,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:170","message":"GET handler entry","data":{"count":5},"timestamp":1767026529991,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:274","message":"After getCachedTweets","data":{"tweetsCount":15,"tweetsType":"object","isArray":true},"timestamp":1767026529991,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:176","message":"Before returning success","data":{"tweetsCount":15,"slicedCount":5,"serializedLength":3326},"timestamp":1767026529992,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}
+{"location":"route.ts:177","message":"Response created successfully","data":{},"timestamp":1767026529992,"sessionId":"debug-session","runId":"run2","hypothesisId":"ALL"}

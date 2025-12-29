@@ -26,7 +26,7 @@ export default function Home() {
     []
   );
   const stars = useGitHubStars(githubUrls);
-  const { tweets, loading: tweetLoading } = useTweets(5);
+  const { tweets } = useTweets(5);
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12 md:py-16">
@@ -59,7 +59,7 @@ export default function Home() {
       </section>
 
       {/* Recent Tweets */}
-      {(tweets.length > 0 || tweetLoading) && (
+      {tweets.length > 0 && (
         <section className="mb-10">
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5">
             Recent Tweets
@@ -78,7 +78,7 @@ export default function Home() {
               </span>
             </span>
           </h2>
-          <TweetCarousel tweets={tweets} loading={tweetLoading} />
+          <TweetCarousel tweets={tweets} />
         </section>
       )}
 

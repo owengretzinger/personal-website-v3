@@ -4,10 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "bun run fetch-data && next build",
     "start": "next start",
     "lint": "eslint",
-    "extract-colors": "bun run scripts/extract-colors.ts"
+    "extract-colors": "bun run scripts/extract-colors.ts",
+    "fetch-tweets": "bun run scripts/fetch-tweets.ts",
+    "fetch-github-stars": "bun run scripts/fetch-github-stars.ts",
+    "fetch-data": "bun run fetch-tweets && bun run fetch-github-stars"
   },
   "dependencies": {
     "next": "16.1.1",
