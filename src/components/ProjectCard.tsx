@@ -21,7 +21,11 @@ const StarIcon = () => (
   </svg>
 );
 
-export const ProjectCard = ({ project, colors = [], stars }: ProjectCardProps) => {
+export const ProjectCard = ({
+  project,
+  colors = [],
+  stars,
+}: ProjectCardProps) => {
   const mainLink = project.link || project.github;
 
   return (
@@ -54,16 +58,6 @@ export const ProjectCard = ({ project, colors = [], stars }: ProjectCardProps) =
             <span className="absolute inset-0" />
             {project.name}
           </a>
-          {stars !== undefined && stars > 0 && project.github && (
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative z-10 flex items-center gap-0.5 text-xs text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
-            >
-              <StarIcon /> {stars}
-            </a>
-          )}
           {project.demo && (
             <a
               href={project.demo}
@@ -73,6 +67,20 @@ export const ProjectCard = ({ project, colors = [], stars }: ProjectCardProps) =
               title="Watch demo"
             >
               <YouTubeIcon className="w-3 h-3" />
+            </a>
+          )}
+          {stars !== undefined && project.github && (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`relative z-10 flex items-center gap-0.5 text-xs text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 ${
+                stars === 0
+                  ? "opacity-0 group-hover:opacity-100 transition-opacity duration-50"
+                  : ""
+              }`}
+            >
+              <StarIcon /> {stars}
             </a>
           )}
         </div>
