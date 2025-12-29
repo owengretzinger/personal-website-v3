@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useGitHubStars } from "@/hooks/useGitHubStars";
 import { useTweets } from "@/hooks/useTweets";
+import { useMobileCenterHover } from "@/hooks/useMobileCenterHover";
 import { ProjectCard } from "@/components/ProjectCard";
 import { TweetCarousel } from "@/components/TweetCarousel";
 import { CurrentExperienceCard } from "@/components/CurrentExperienceCard";
@@ -28,6 +29,69 @@ export default function Home() {
   const stars = useGitHubStars(githubUrls);
   const { tweets } = useTweets(5);
 
+  // Mobile center-hover: track all hoverable items
+  // Index layout: [currentExp, ...previousExp, ...projects]
+  const currentExpRef = useRef<HTMLDivElement | null>(null);
+  const previousExpRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const projectRefs = useRef<(HTMLLIElement | null)[]>([]);
+
+  // Clean up stale refs when project count changes
+  if (projectRefs.current.length > displayedProjects.length) {
+    projectRefs.current = projectRefs.current.slice(0, displayedProjects.length);
+  }
+
+  // Callback to get all items - called by hook when needed
+  const getItems = useCallback((): (HTMLElement | null)[] => {
+    return [
+      currentExpRef.current,
+      ...previousExpRefs.current,
+      ...projectRefs.current,
+    ];
+  }, []);
+
+  // Check if element is a work item (current exp or previous exp)
+  const isWorkItem = useCallback((el: HTMLElement) => {
+    if (el === currentExpRef.current) return true;
+    if (previousExpRefs.current.includes(el as HTMLLIElement)) return true;
+    return false;
+  }, []);
+
+  const activeIndex = useMobileCenterHover(getItems, isWorkItem);
+
+  // Find which item is active by matching the element
+  const getActiveStates = useCallback(() => {
+    if (activeIndex === null) {
+      return { isCurrentExpActive: false, previousExpActiveIndex: null, projectActiveIndex: null };
+    }
+
+    const items = getItems();
+    const activeEl = items[activeIndex];
+    if (!activeEl) {
+      return { isCurrentExpActive: false, previousExpActiveIndex: null, projectActiveIndex: null };
+    }
+
+    // Check if it's the current experience
+    if (activeEl === currentExpRef.current) {
+      return { isCurrentExpActive: true, previousExpActiveIndex: null, projectActiveIndex: null };
+    }
+
+    // Check if it's a previous experience
+    const prevIndex = previousExpRefs.current.indexOf(activeEl as HTMLLIElement);
+    if (prevIndex !== -1) {
+      return { isCurrentExpActive: false, previousExpActiveIndex: prevIndex, projectActiveIndex: null };
+    }
+
+    // Check if it's a project
+    const projIndex = projectRefs.current.indexOf(activeEl as HTMLLIElement);
+    if (projIndex !== -1) {
+      return { isCurrentExpActive: false, previousExpActiveIndex: null, projectActiveIndex: projIndex };
+    }
+
+    return { isCurrentExpActive: false, previousExpActiveIndex: null, projectActiveIndex: null };
+  }, [activeIndex, getItems]);
+
+  const { isCurrentExpActive, previousExpActiveIndex, projectActiveIndex } = getActiveStates();
+
   return (
     <main className="mx-auto max-w-2xl px-6 py-12 md:py-16">
       {/* Header */}
@@ -51,11 +115,19 @@ export default function Home() {
         <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
           Currently
         </h2>
-        <CurrentExperienceCard
-          experience={currentExperience}
-          colors={imageColors[currentExperience.company]}
+        <div ref={currentExpRef}>
+          <CurrentExperienceCard
+            experience={currentExperience}
+            colors={imageColors[currentExperience.company]}
+            isActive={isCurrentExpActive}
+          />
+        </div>
+        <PreviouslySection
+          experience={previousExperience}
+          colors={imageColors}
+          activeIndex={previousExpActiveIndex}
+          itemRefs={previousExpRefs}
         />
-        <PreviouslySection experience={previousExperience} colors={imageColors} />
       </section>
 
       {/* Recent Tweets */}
@@ -92,12 +164,18 @@ export default function Home() {
           Projects
         </h2>
         <ul className="space-y-2">
-          {displayedProjects.map((project) => (
-            <li key={project.name}>
+          {displayedProjects.map((project, index) => (
+            <li
+              key={project.name}
+              ref={(el) => {
+                projectRefs.current[index] = el;
+              }}
+            >
               <ProjectCard
                 project={project}
                 colors={imageColors[project.name]}
                 stars={project.github ? stars[project.github] : undefined}
+                isActive={projectActiveIndex === index}
               />
             </li>
           ))}

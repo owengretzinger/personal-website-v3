@@ -7,6 +7,7 @@ interface ProjectCardProps {
   project: Project;
   colors?: string[];
   stars?: number;
+  isActive?: boolean; // For mobile center-hover effect
 }
 
 const StarIcon = () => (
@@ -25,19 +26,25 @@ export const ProjectCard = ({
   project,
   colors = [],
   stars,
+  isActive = false,
 }: ProjectCardProps) => {
   const mainLink = project.link || project.github;
+  const gradient = colors.length > 0 ? generateGradient(colors) : undefined;
 
   return (
     <div
       className="group relative flex gap-2.5 rounded-lg p-2 transition-all"
+      style={isActive && gradient ? { background: gradient } : undefined}
       onMouseEnter={(e) => {
-        if (colors.length > 0) {
-          e.currentTarget.style.background = generateGradient(colors);
+        if (gradient) {
+          e.currentTarget.style.background = gradient;
         }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.background = "";
+        // Only clear if not active (mobile center-hover)
+        if (!isActive) {
+          e.currentTarget.style.background = "";
+        }
       }}
     >
       <Image
@@ -75,7 +82,7 @@ export const ProjectCard = ({
               target="_blank"
               rel="noopener noreferrer"
               className={`relative z-10 flex items-center gap-0.5 text-xs text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 ${
-                stars === 0
+                stars === 0 && !isActive
                   ? "opacity-0 group-hover:opacity-100 transition-opacity duration-50"
                   : ""
               }`}

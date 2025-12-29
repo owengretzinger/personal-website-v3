@@ -5,22 +5,28 @@ import { generateGradient } from "@/utils/colors";
 interface CurrentExperienceCardProps {
   experience: Experience;
   colors?: string[];
+  isActive?: boolean;
 }
 
-export const CurrentExperienceCard = ({ experience, colors = [] }: CurrentExperienceCardProps) => {
+export const CurrentExperienceCard = ({ experience, colors = [], isActive = false }: CurrentExperienceCardProps) => {
+  const gradient = colors.length > 0 ? generateGradient(colors) : undefined;
+
   return (
     <a
       href={experience.link}
       target="_blank"
       rel="noopener noreferrer"
       className="group flex gap-2.5 rounded-lg p-2 transition-all"
+      style={isActive && gradient ? { background: gradient } : undefined}
       onMouseEnter={(e) => {
-        if (colors.length > 0) {
-          e.currentTarget.style.background = generateGradient(colors);
+        if (gradient) {
+          e.currentTarget.style.background = gradient;
         }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.background = "";
+        if (!isActive) {
+          e.currentTarget.style.background = "";
+        }
       }}
     >
       <Image

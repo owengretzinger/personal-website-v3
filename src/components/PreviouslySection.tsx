@@ -7,9 +7,11 @@ import { YouTubeIcon } from "./icons";
 interface PreviouslySectionProps {
   experience: Experience[];
   colors?: Record<string, string[]>;
+  activeIndex?: number | null;
+  itemRefs?: React.RefObject<(HTMLLIElement | null)[]>;
 }
 
-export const PreviouslySection = ({ experience, colors = {} }: PreviouslySectionProps) => {
+export const PreviouslySection = ({ experience, colors = {}, activeIndex = null, itemRefs }: PreviouslySectionProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -20,18 +22,32 @@ export const PreviouslySection = ({ experience, colors = {} }: PreviouslySection
             Previously
           </h2>
           <ul className="space-y-2">
-            {experience.map((exp) => (
-              <li key={exp.company}>
+            {experience.map((exp, index) => {
+              const expColors = colors[exp.company];
+              const gradient = expColors && expColors.length > 0 ? generateGradient(expColors) : undefined;
+              const isActive = activeIndex === index;
+
+              return (
+              <li
+                key={exp.company}
+                ref={(el) => {
+                  if (itemRefs?.current) {
+                    itemRefs.current[index] = el;
+                  }
+                }}
+              >
                 <div
                   className="group relative flex gap-2.5 rounded-lg p-2 transition-all"
+                  style={isActive && gradient ? { background: gradient } : undefined}
                   onMouseEnter={(e) => {
-                    const expColors = colors[exp.company];
-                    if (expColors && expColors.length > 0) {
-                      e.currentTarget.style.background = generateGradient(expColors);
+                    if (gradient) {
+                      e.currentTarget.style.background = gradient;
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "";
+                    if (!isActive) {
+                      e.currentTarget.style.background = "";
+                    }
                   }}
                 >
                   <Image
@@ -70,7 +86,8 @@ export const PreviouslySection = ({ experience, colors = {} }: PreviouslySection
                   </div>
                 </div>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </section>
       )}
