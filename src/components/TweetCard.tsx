@@ -192,10 +192,8 @@ export const TweetCard = ({ tweet, priority = false }: TweetCardProps) => {
           <span className="text-xs text-neutral-600 dark:text-neutral-400">
             @{tweet.author.screenName}
           </span>
-          <span className="text-xs text-neutral-400 dark:text-neutral-500 -ml-1">
-            ·
-          </span>
-          <span className="text-xs text-neutral-400 dark:text-neutral-500 -ml-1">
+          <span className="text-xs text-neutral-400 -ml-1">·</span>
+          <span className="text-xs text-neutral-400 -ml-1">
             {formatRelativeTime(tweet.createdAt)}
           </span>
         </div>
