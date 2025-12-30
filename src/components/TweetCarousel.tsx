@@ -60,22 +60,18 @@ export const TweetCarousel = ({ tweets }: TweetCarouselProps) => {
             </svg>
           </button>
 
-          <div className="flex items-center -mx-1.5">
+          <div className="flex items-center gap-1.5" aria-hidden="true">
             {tweets.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className="min-w-6 min-h-6 -mx-[3px] flex items-center justify-center"
-                aria-label={`Go to tweet ${index + 1}`}
-              >
-                <span
-                  className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                    index === currentIndex
-                      ? "bg-neutral-600 dark:bg-neutral-300"
-                      : "bg-neutral-300 dark:bg-neutral-600 hover:bg-neutral-400 dark:hover:bg-neutral-500"
-                  }`}
-                />
-              </button>
+                className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                  index === currentIndex
+                    ? "bg-neutral-600 dark:bg-neutral-300"
+                    : "bg-neutral-300 dark:bg-neutral-600 hover:bg-neutral-400 dark:hover:bg-neutral-500"
+                }`}
+                tabIndex={-1}
+              />
             ))}
           </div>
 
