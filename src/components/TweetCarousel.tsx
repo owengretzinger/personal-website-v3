@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { TweetCard, type Tweet } from "./TweetCard";
 
 interface TweetCarouselProps {
@@ -9,6 +9,7 @@ interface TweetCarouselProps {
 
 export const TweetCarousel = ({ tweets }: TweetCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
 
   if (tweets.length === 0) {
     return null;
@@ -22,8 +23,30 @@ export const TweetCarousel = ({ tweets }: TweetCarouselProps) => {
     setCurrentIndex((prev) => (prev === tweets.length - 1 ? 0 : prev + 1));
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        goToNext();
+      } else {
+        goToPrevious();
+      }
+    }
+    touchStartX.current = null;
+  };
+
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Navigation - above tweet */}
       {tweets.length > 1 && (
         <div className="flex items-center justify-start gap-2 mb-2">
