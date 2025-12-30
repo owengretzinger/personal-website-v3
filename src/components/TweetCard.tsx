@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import { XIcon } from "./icons";
 
@@ -143,14 +141,7 @@ function parseTweetText(text: string): React.ReactNode[] {
         .replace(/^www\./, "")
         .slice(0, 30);
       parts.push(
-        <span
-          key={match.index}
-          className="text-blue-500 hover:underline cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation();
-            window.open(url, "_blank");
-          }}
-        >
+        <span key={match.index} className="text-blue-500">
           {displayUrl}
           {url.length > 30 ? "..." : ""}
         </span>
