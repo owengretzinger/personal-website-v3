@@ -9,6 +9,13 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    name: "constellagent",
+    description: "run dozens of claude code workspaces in parallel",
+    link: "https://constellagent.com",
+    github: "https://github.com/owengretzinger/constellagent",
+    image: "/project-images/constellagent.png",
+  },
+  {
     name: "meetingbot",
     description: "open source meeting bot api",
     link: "https://meetingbot.tech",

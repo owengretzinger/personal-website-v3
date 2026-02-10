@@ -2,6 +2,11 @@
 // Run: bun run extract-colors
 
 export const imageColors: Record<string, string[]> = {
+  "constellagent": [
+    "#539fc6",
+    "#53a0c6",
+    "#536ec6"
+  ],
   "meetingbot": [
     "#5367c6",
     "#626fb7"
