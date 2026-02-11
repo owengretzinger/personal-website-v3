@@ -11,7 +11,7 @@ export const projects: Project[] = [
   {
     name: "constellagent",
     description: "run dozens of claude code workspaces in parallel",
-    link: "https://constellagent.com",
+    link: "https://constellagent.vercel.app/",
     github: "https://github.com/owengretzinger/constellagent",
     image: "/project-images/constellagent.png",
   },
