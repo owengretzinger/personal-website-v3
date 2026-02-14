@@ -13,6 +13,7 @@ export const projects: Project[] = [
     description: "run dozens of claude code workspaces in parallel",
     link: "https://constellagent.vercel.app/",
     github: "https://github.com/owengretzinger/constellagent",
+    demo: "https://x.com/owengretzinger/status/2021954016083837411",
     image: "/project-images/constellagent.png",
   },
   {
