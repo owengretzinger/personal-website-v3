@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Bricolage_Grotesque } from "next/font/google";
+import { TrafficTracker } from "@/components/TrafficTracker";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -75,6 +77,8 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <TrafficTracker />
+        <Analytics />
       </body>
     </html>
   );

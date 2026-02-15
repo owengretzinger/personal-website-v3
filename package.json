@@ -13,6 +13,8 @@
     "fetch-data": "bun run fetch-tweets && bun run fetch-github-stars"
   },
   "dependencies": {
+    "@upstash/redis": "^1.36.2",
+    "@vercel/analytics": "^1.6.1",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
