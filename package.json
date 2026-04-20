@@ -11,7 +11,9 @@
     "fetch-tweets": "bun run scripts/fetch-tweets.ts",
     "fetch-github-stars": "bun run scripts/fetch-github-stars.ts",
     "fetch-data": "bun run fetch-tweets && bun run fetch-github-stars",
-    "x-auth": "bun run scripts/x-auth.ts"
+    "x-auth": "bun run scripts/x-auth.ts",
+    "x-test": "bun run scripts/x-test.ts",
+    "x-test-mock": "bun run scripts/x-test-mock.ts"
   },
   "dependencies": {
     "@upstash/redis": "^1.36.2",

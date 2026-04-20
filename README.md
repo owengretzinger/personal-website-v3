@@ -66,3 +66,12 @@ refreshes the access token before fetching tweets — no manual rotation needed.
 If Upstash env vars aren't set, the tokens are written to a local
 `.tokens.json` (gitignored) instead, which works for local `bun run fetch-data`
 but won't help Vercel builds.
+
+### Verifying the X integration
+
+- `bun run x-test-mock` — fully mocked end-to-end test of the refresh + fetch
+  pipeline. Requires no creds, no network. Good as a regression check.
+- `bun run x-test` — non-destructive smoke test that uses your **real** stored
+  refresh token to hit `/users/me` + `/users/{id}/tweets` and prints what it
+  would write. Does **not** modify `src/data/tweets.json`. Run this after
+  `bun run x-auth` to confirm everything works before redeploying.
