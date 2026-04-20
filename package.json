@@ -10,7 +10,8 @@
     "extract-colors": "bun run scripts/extract-colors.ts",
     "fetch-tweets": "bun run scripts/fetch-tweets.ts",
     "fetch-github-stars": "bun run scripts/fetch-github-stars.ts",
-    "fetch-data": "bun run fetch-tweets && bun run fetch-github-stars"
+    "fetch-data": "bun run fetch-tweets && bun run fetch-github-stars",
+    "x-auth": "bun run scripts/x-auth.ts"
   },
   "dependencies": {
     "@upstash/redis": "^1.36.2",

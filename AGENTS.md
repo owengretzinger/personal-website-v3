@@ -21,8 +21,8 @@ Two JSON data files (`src/data/tweets.json` and `src/data/github-stars.json`) ar
 ### External services (all optional)
 
 All external services degrade gracefully when unconfigured:
-- **Upstash Redis** (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`): traffic tracking; returns zeros when absent.
-- **Twitter API** (`TWITTER_API_BEARER_TOKEN`): tweet carousel; hidden when absent.
+- **Upstash Redis** (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`): traffic tracking + persistent storage of the X OAuth2 refresh token (`x:tokens`); returns zeros / empty tweets when absent.
+- **X / Twitter API** (`X_CLIENT_ID`, `X_CLIENT_SECRET`): tweet carousel. Uses OAuth2 user-context auth — bootstrap once with `bun run x-auth` (opens a browser; writes refresh token to Upstash). The build refreshes the access token automatically. Carousel is hidden when no tokens are available.
 - **GitHub API** (`GITHUB_TOKEN`): star counts; uses public API without token.
 - **Vercel Analytics**: no-op outside Vercel.
 
