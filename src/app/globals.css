@@ -43,3 +43,98 @@ body {
     }
   }
 }
+
+.article-prose {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: #262626;
+}
+@media (prefers-color-scheme: dark) {
+  .article-prose {
+    color: #e5e5e5;
+  }
+}
+.article-prose > * + * {
+  margin-top: 1em;
+}
+.article-prose h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 2em;
+  margin-bottom: 0.4em;
+}
+.article-prose h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.6em;
+  margin-bottom: 0.2em;
+}
+.article-prose a {
+  color: #2563eb;
+  text-underline-offset: 2px;
+  text-decoration: underline;
+  text-decoration-color: rgba(37, 99, 235, 0.35);
+}
+.article-prose a:hover {
+  text-decoration-color: #2563eb;
+}
+.article-prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+}
+@media (prefers-color-scheme: dark) {
+  .article-prose code {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+.article-prose pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+@media (prefers-color-scheme: dark) {
+  .article-prose pre {
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+.article-prose pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+.article-prose ul,
+.article-prose ol {
+  padding-left: 1.25rem;
+}
+.article-prose ul {
+  list-style-type: disc;
+}
+.article-prose ol {
+  list-style-type: decimal;
+}
+.article-prose li + li {
+  margin-top: 0.25em;
+}
+.article-prose blockquote {
+  border-left: 2px solid #d4d4d4;
+  padding-left: 0.875rem;
+  color: #525252;
+  font-style: italic;
+}
+@media (prefers-color-scheme: dark) {
+  .article-prose blockquote {
+    border-left-color: #404040;
+    color: #a3a3a3;
+  }
+}
+.article-prose img {
+  border-radius: 0.5rem;
+}
