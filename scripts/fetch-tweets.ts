@@ -119,10 +119,14 @@ async function fetchTweets(): Promise<TweetData[]> {
 
     if (tweets.length === 0) return [];
 
+    const hasRenderableText = (text: string) =>
+      text.replace(/\s*https?:\/\/t\.co\/\w+/g, "").trim().length > 0;
+
     const filtered = tweets.filter(
       (t) =>
         !t.text.startsWith("@") &&
-        (t.public_metrics?.like_count || 0) >= MIN_LIKES_THRESHOLD,
+        (t.public_metrics?.like_count || 0) >= MIN_LIKES_THRESHOLD &&
+        (hasRenderableText(t.text) || (t.attachments?.media_keys?.length ?? 0) > 0),
     );
 
     return filtered.map((tweet) => {
