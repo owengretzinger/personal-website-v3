@@ -21,6 +21,11 @@ type TweetData = {
     url: string;
     aspectRatio?: number;
   }[];
+  article?: {
+    title: string;
+    preview: string;
+    cover?: string;
+  };
 };
 
 const TWITTER_USERNAME = "owengretzinger";
@@ -37,6 +42,11 @@ type RawTweet = {
   };
   attachments?: { media_keys?: string[] };
   referenced_tweets?: { type: string; id: string }[];
+  article?: {
+    title?: string;
+    preview_text?: string;
+    cover_media?: string;
+  };
 };
 
 type RawMedia = {
@@ -83,8 +93,8 @@ async function fetchTweets(): Promise<TweetData[]> {
 
     const tweetsParams = new URLSearchParams({
       max_results: "50",
-      "tweet.fields": "created_at,public_metrics,attachments,referenced_tweets",
-      expansions: "attachments.media_keys",
+      "tweet.fields": "created_at,public_metrics,attachments,referenced_tweets,article",
+      expansions: "attachments.media_keys,article.cover_media",
       "media.fields": "url,type,width,height,preview_image_url",
       exclude: "replies,retweets",
     });
@@ -126,7 +136,9 @@ async function fetchTweets(): Promise<TweetData[]> {
       (t) =>
         !t.text.startsWith("@") &&
         (t.public_metrics?.like_count || 0) >= MIN_LIKES_THRESHOLD &&
-        (hasRenderableText(t.text) || (t.attachments?.media_keys?.length ?? 0) > 0),
+        (hasRenderableText(t.text) ||
+          (t.attachments?.media_keys?.length ?? 0) > 0 ||
+          !!t.article?.title),
     );
 
     return filtered.map((tweet) => {
@@ -158,6 +170,15 @@ async function fetchTweets(): Promise<TweetData[]> {
           replies: tweet.public_metrics?.reply_count || 0,
         },
         media: media.length > 0 ? media : undefined,
+        article: tweet.article?.title
+          ? {
+              title: tweet.article.title,
+              preview: tweet.article.preview_text ?? "",
+              cover: tweet.article.cover_media
+                ? mediaMap.get(tweet.article.cover_media)?.url
+                : undefined,
+            }
+          : undefined,
       };
     });
   } catch (error) {

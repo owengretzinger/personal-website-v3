@@ -38,6 +38,11 @@ export type Tweet = {
     url: string;
     aspectRatio?: number;
   }[];
+  article?: {
+    title: string;
+    preview: string;
+    cover?: string;
+  };
 };
 
 interface TweetCardProps {
@@ -192,9 +197,35 @@ export const TweetCard = ({ tweet, priority = false }: TweetCardProps) => {
       </div>
 
       {/* Tweet text */}
-      <p className="text-sm leading-relaxed mb-2 whitespace-pre-wrap">
-        {parseTweetText(tweet.text)}
-      </p>
+      {parseTweetText(tweet.text).length > 0 && (
+        <p className="text-sm leading-relaxed mb-2 whitespace-pre-wrap">
+          {parseTweetText(tweet.text)}
+        </p>
+      )}
+
+      {/* Article preview */}
+      {tweet.article && (
+        <div className="mb-2 rounded-lg border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+          {tweet.article.cover && (
+            <Image
+              src={tweet.article.cover}
+              alt={tweet.article.title}
+              width={600}
+              height={240}
+              className="w-full h-auto max-h-[160px] object-cover"
+              priority={priority}
+            />
+          )}
+          <div className="p-2.5">
+            <div className="text-sm font-semibold leading-snug mb-1">
+              {tweet.article.title}
+            </div>
+            <div className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400 line-clamp-3 whitespace-pre-wrap">
+              {tweet.article.preview}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Media thumbnails */}
       {tweet.media && tweet.media.length > 0 && (
