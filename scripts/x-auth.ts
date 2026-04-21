@@ -20,7 +20,8 @@ import { saveTokens, type StoredTokens } from "./x-tokens";
 const CLIENT_ID = process.env.X_CLIENT_ID;
 const CLIENT_SECRET = process.env.X_CLIENT_SECRET;
 const PORT = Number(process.env.X_AUTH_PORT ?? 3939);
-const REDIRECT_URI = `http://localhost:${PORT}/callback`;
+const REDIRECT_HOST = process.env.X_AUTH_HOST ?? "localdev";
+const REDIRECT_URI = `http://${REDIRECT_HOST}:${PORT}/callback`;
 const SCOPES = ["tweet.read", "users.read", "offline.access"].join(" ");
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
