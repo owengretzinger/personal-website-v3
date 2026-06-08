@@ -8,7 +8,7 @@ export type Experience = {
 
 export const experience: Experience[] = [
   {
-    title: "founding engineer",
+    title: "head of engineering",
     company: "boardy",
     image: "/work-experience-images/boardy.png",
     link: "https://boardy.ai",

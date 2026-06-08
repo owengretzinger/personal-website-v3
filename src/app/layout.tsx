@@ -13,13 +13,13 @@ const bricolage = Bricolage_Grotesque({
 const siteUrl = "https://owengretzinger.com";
 const title = "owen gretzinger";
 const description =
-  "owen gretzinger, founding engineer at boardy: view my work, projects, social links, and more";
+  "owen gretzinger, head of engineering at boardy: view my work, projects, social links, and more";
 
 export const metadata: Metadata = {
   title,
   description,
   keywords:
-    "Owen Gretzinger, Boardy, Founding Engineer, Software Engineer, McMaster University, RBC Amplify, DeltaHacks, Arctic Wolf, Open Source, AI, Meetingbot, Meetingnotes, Gitreadme",
+    "Owen Gretzinger, Boardy, Head of Engineering, Software Engineer, McMaster University, RBC Amplify, DeltaHacks, Arctic Wolf, Open Source, AI, Meetingbot, Meetingnotes, Gitreadme",
   creator: "Owen Gretzinger",
   authors: [{ name: "Owen Gretzinger" }],
   metadataBase: new URL(siteUrl),
@@ -52,7 +52,7 @@ const jsonLd = {
   name: "Owen Gretzinger",
   url: siteUrl,
   image: `${siteUrl}/pfp.png`,
-  jobTitle: "Founding Engineer",
+  jobTitle: "Head of Engineering",
   worksFor: {
     "@type": "Organization",
     name: "Boardy",
