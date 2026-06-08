@@ -72,7 +72,7 @@ export default async function Image() {
                 color: "#a3a3a3",
               }}
             >
-              founding engineer @ boardy
+              head of engineering @ boardy
             </div>
           </div>
         </div>
