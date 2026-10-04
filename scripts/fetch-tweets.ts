@@ -1,188 +1,119 @@
 import * as fs from "fs";
 import * as path from "path";
-import { getAccessToken } from "./x-tokens";
-
-type TweetData = {
-  id: string;
-  text: string;
-  createdAt: string;
-  author: {
-    name: string;
-    screenName: string;
-    profileImageUrl: string;
-  };
-  metrics: {
-    likes: number;
-    retweets: number;
-    replies: number;
-  };
-  media?: {
-    type: "photo" | "video";
-    url: string;
-    aspectRatio?: number;
-  }[];
-  article?: {
-    title: string;
-    preview: string;
-    cover?: string;
-  };
-};
+import type { Tweet } from "../src/components/TweetCard";
 
 const TWITTER_USERNAME = "owengretzinger";
 const MIN_LIKES_THRESHOLD = 40;
+const PAGES_TO_SCAN = 3;
+const FXTWITTER = "https://api.fxtwitter.com";
 
-type RawTweet = {
-  id: string;
-  text: string;
-  created_at: string;
-  public_metrics?: {
-    like_count?: number;
-    retweet_count?: number;
-    reply_count?: number;
-  };
-  attachments?: { media_keys?: string[] };
-  referenced_tweets?: { type: string; id: string }[];
-  article?: {
-    title?: string;
-    preview_text?: string;
-    cover_media?: string;
-  };
-};
-
-type RawMedia = {
-  media_key: string;
+type FxMedia = {
   type: string;
-  url?: string;
-  preview_image_url?: string;
+  url: string;
+  thumbnail_url?: string;
   width?: number;
   height?: number;
 };
 
-async function fetchTweets(): Promise<TweetData[]> {
-  let accessToken: string;
-  try {
-    accessToken = await getAccessToken();
-  } catch (err) {
-    console.error((err as Error).message);
-    return [];
+type FxArticle = {
+  title?: string;
+  preview_text?: string;
+  cover_media?: { media_info?: { original_img_url?: string } };
+};
+
+type FxStatus = {
+  id: string;
+  text: string;
+  created_timestamp: number;
+  author: { name: string; screen_name: string; avatar_url: string };
+  likes: number;
+  reposts: number | null;
+  replies: number;
+  replying_to: unknown;
+  media?: { all?: FxMedia[] };
+  article?: FxArticle | null;
+};
+
+async function getJson<T>(url: string): Promise<T> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`${url} → ${res.status}`);
+  return res.json() as Promise<T>;
+}
+
+async function fetchTimeline(): Promise<FxStatus[]> {
+  const statuses: FxStatus[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < PAGES_TO_SCAN; page++) {
+    const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
+    const data = await getJson<{
+      results: FxStatus[];
+      cursor?: { bottom?: string };
+    }>(`${FXTWITTER}/2/profile/${TWITTER_USERNAME}/statuses${query}`);
+    statuses.push(...data.results);
+    cursor = data.cursor?.bottom;
+    if (!cursor || data.results.length === 0) break;
   }
+  return statuses;
+}
 
-  const headers = { Authorization: `Bearer ${accessToken}` };
+// The timeline endpoint omits article cover images; the single-status endpoint includes them.
+async function fetchArticleCover(id: string): Promise<string | undefined> {
+  const data = await getJson<{ tweet: FxStatus }>(
+    `${FXTWITTER}/${TWITTER_USERNAME}/status/${id}`,
+  );
+  return data.tweet.article?.cover_media?.media_info?.original_img_url;
+}
 
-  try {
-    const meResponse = await fetch(
-      "https://api.x.com/2/users/me?user.fields=profile_image_url,name,username",
-      { headers },
-    );
+async function toTweet(s: FxStatus): Promise<Tweet> {
+  const media = (s.media?.all ?? [])
+    .filter((m) => m.type === "photo" || m.type === "video")
+    .map((m) => ({
+      type: m.type as "photo" | "video",
+      url: m.type === "video" ? (m.thumbnail_url ?? "") : m.url,
+      aspectRatio: m.width && m.height ? m.width / m.height : undefined,
+    }));
 
-    if (!meResponse.ok) {
-      console.error(
-        "X /users/me lookup failed:",
-        meResponse.status,
-        await meResponse.text(),
-      );
-      return [];
-    }
-
-    const meData = await meResponse.json();
-    const me = meData.data;
-    if (!me?.id) {
-      console.error("Could not get user id from /users/me", meData);
-      return [];
-    }
-
-    const tweetsParams = new URLSearchParams({
-      max_results: "50",
-      "tweet.fields": "created_at,public_metrics,attachments,referenced_tweets,article",
-      expansions: "attachments.media_keys,article.cover_media",
-      "media.fields": "url,type,width,height,preview_image_url",
-      exclude: "replies,retweets",
-    });
-
-    const tweetsResponse = await fetch(
-      `https://api.x.com/2/users/${me.id}/tweets?${tweetsParams}`,
-      { headers },
-    );
-
-    if (!tweetsResponse.ok) {
-      const errorText = await tweetsResponse.text();
-      console.error("X tweets fetch failed:", tweetsResponse.status, errorText);
-      return [];
-    }
-
-    const tweetsData = await tweetsResponse.json();
-    const tweets: RawTweet[] = tweetsData.data ?? [];
-
-    const mediaMap = new Map<
-      string,
-      { url: string; type: string; width?: number; height?: number }
-    >();
-    for (const m of (tweetsData.includes?.media as RawMedia[] | undefined) ??
-      []) {
-      mediaMap.set(m.media_key, {
-        url: m.url || m.preview_image_url || "",
-        type: m.type,
-        width: m.width,
-        height: m.height,
-      });
-    }
-
-    if (tweets.length === 0) return [];
-
-    const hasRenderableText = (text: string) =>
-      text.replace(/\s*https?:\/\/t\.co\/\w+/g, "").trim().length > 0;
-
-    const filtered = tweets.filter(
-      (t) =>
-        !t.text.startsWith("@") &&
-        (t.public_metrics?.like_count || 0) >= MIN_LIKES_THRESHOLD &&
-        (hasRenderableText(t.text) ||
-          (t.attachments?.media_keys?.length ?? 0) > 0 ||
-          !!t.article?.title),
-    );
-
-    return filtered.map((tweet) => {
-      const media: TweetData["media"] = [];
-      for (const key of tweet.attachments?.media_keys ?? []) {
-        const m = mediaMap.get(key);
-        if (m && (m.type === "photo" || m.type === "video")) {
-          media.push({
-            type: m.type as "photo" | "video",
-            url: m.url,
-            aspectRatio: m.width && m.height ? m.width / m.height : undefined,
-          });
+  return {
+    id: s.id,
+    text: s.text,
+    createdAt: new Date(s.created_timestamp * 1000).toISOString(),
+    author: {
+      name: s.author.name,
+      screenName: s.author.screen_name,
+      profileImageUrl: s.author.avatar_url,
+    },
+    metrics: {
+      likes: s.likes,
+      retweets: s.reposts ?? 0,
+      replies: s.replies,
+    },
+    media: media.length > 0 ? media : undefined,
+    article: s.article?.title
+      ? {
+          title: s.article.title,
+          preview: s.article.preview_text ?? "",
+          cover: await fetchArticleCover(s.id),
         }
-      }
-      return {
-        id: tweet.id,
-        text: tweet.text,
-        createdAt: tweet.created_at,
-        author: {
-          name: me.name ?? "owen",
-          screenName: me.username ?? TWITTER_USERNAME,
-          profileImageUrl:
-            me.profile_image_url ||
-            "https://pbs.twimg.com/profile_images/default.jpg",
-        },
-        metrics: {
-          likes: tweet.public_metrics?.like_count || 0,
-          retweets: tweet.public_metrics?.retweet_count || 0,
-          replies: tweet.public_metrics?.reply_count || 0,
-        },
-        media: media.length > 0 ? media : undefined,
-        article: tweet.article?.title
-          ? {
-              title: tweet.article.title,
-              preview: tweet.article.preview_text ?? "",
-              cover: tweet.article.cover_media
-                ? mediaMap.get(tweet.article.cover_media)?.url
-                : undefined,
-            }
-          : undefined,
-      };
-    });
+      : undefined,
+  };
+}
+
+async function fetchTweets(): Promise<Tweet[]> {
+  try {
+    const statuses = await fetchTimeline();
+    const filtered = statuses.filter(
+      (s) =>
+        s.author.screen_name.toLowerCase() === TWITTER_USERNAME &&
+        !s.replying_to &&
+        !s.text.startsWith("@") &&
+        s.likes >= MIN_LIKES_THRESHOLD &&
+        (s.text.trim().length > 0 ||
+          (s.media?.all?.length ?? 0) > 0 ||
+          !!s.article?.title),
+    );
+    return await Promise.all(filtered.map(toTweet));
   } catch (error) {
-    console.error("X API error:", error);
+    console.error("fxtwitter error:", error);
     return [];
   }
 }
