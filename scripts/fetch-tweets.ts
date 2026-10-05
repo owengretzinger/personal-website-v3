@@ -45,10 +45,17 @@ async function fetchTimeline(): Promise<FxStatus[]> {
   let cursor: string | undefined;
   for (let page = 0; page < PAGES_TO_SCAN; page++) {
     const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
-    const data = await getJson<{
-      results: FxStatus[];
-      cursor?: { bottom?: string };
-    }>(`${FXTWITTER}/2/profile/${TWITTER_USERNAME}/statuses${query}`);
+    let data: { results: FxStatus[]; cursor?: { bottom?: string } };
+    try {
+      data = await getJson(
+        `${FXTWITTER}/2/profile/${TWITTER_USERNAME}/statuses${query}`,
+      );
+    } catch (error) {
+      // Later pages intermittently 404; keep whatever we already have.
+      if (statuses.length === 0) throw error;
+      console.warn("Stopping pagination early:", (error as Error).message);
+      break;
+    }
     statuses.push(...data.results);
     cursor = data.cursor?.bottom;
     if (!cursor || data.results.length === 0) break;
@@ -58,10 +65,15 @@ async function fetchTimeline(): Promise<FxStatus[]> {
 
 // The timeline endpoint omits article cover images; the single-status endpoint includes them.
 async function fetchArticleCover(id: string): Promise<string | undefined> {
-  const data = await getJson<{ tweet: FxStatus }>(
-    `${FXTWITTER}/${TWITTER_USERNAME}/status/${id}`,
-  );
-  return data.tweet.article?.cover_media?.media_info?.original_img_url;
+  try {
+    const data = await getJson<{ tweet: FxStatus }>(
+      `${FXTWITTER}/${TWITTER_USERNAME}/status/${id}`,
+    );
+    return data.tweet.article?.cover_media?.media_info?.original_img_url;
+  } catch (error) {
+    console.warn("Skipping article cover:", (error as Error).message);
+    return undefined;
+  }
 }
 
 async function toTweet(s: FxStatus): Promise<Tweet> {
