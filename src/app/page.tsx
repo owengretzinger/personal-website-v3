@@ -6,10 +6,12 @@ import { imageColors } from "@/data/colors";
 import tweetsData from "@/data/tweets.json";
 import starsData from "@/data/github-stars.json";
 import { type Tweet } from "@/components/TweetCard";
+import { getAllArticles } from "@/lib/articles";
 
 export default function Home() {
   const tweets = (tweetsData as Tweet[]).slice(0, 5);
   const stars = starsData as Record<string, number>;
+  const articles = getAllArticles();
 
   // Render tweets section at server level for SSR
   const tweetsSection =
@@ -43,6 +45,7 @@ export default function Home() {
     <HomeContent
       projects={projects}
       experience={experience}
+      articles={articles}
       tweetsSection={tweetsSection}
       imageColors={imageColors}
       stars={stars}
