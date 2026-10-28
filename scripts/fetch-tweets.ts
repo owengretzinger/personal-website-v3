@@ -34,10 +34,14 @@ type FxStatus = {
   article?: FxArticle | null;
 };
 
-async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`${url} → ${res.status}`);
-  return res.json() as Promise<T>;
+// fxtwitter intermittently 404s valid requests, so retry before giving up.
+async function getJson<T>(url: string, attempts = 4): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(url);
+    if (res.ok) return res.json() as Promise<T>;
+    if (attempt >= attempts) throw new Error(`${url} → ${res.status}`);
+    await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+  }
 }
 
 async function fetchTimeline(): Promise<FxStatus[]> {
